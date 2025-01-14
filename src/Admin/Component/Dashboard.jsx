@@ -22,7 +22,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
           <div className="flex items-center gap-4">
@@ -33,7 +33,7 @@ const Dashboard = () => {
               <span className="text-white text-sm">A</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
