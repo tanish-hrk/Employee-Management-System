@@ -1,8 +1,20 @@
-const mongoose =require('mongoose')
-function connectToDatabase(){
-    mongoose.connect(process.env.MONGO_URI).then(
-        console.log('connected to database')
-    )
-}
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
-module.exports = connectToDatabase
+dotenv.config();
+
+const connectToDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      // Removed deprecated options
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
+    });
+    console.log('Database connected successfully');
+  } catch (err) {
+    console.error('Database connection error:', err);
+    throw err;
+  }
+};
+
+module.exports = connectToDB;

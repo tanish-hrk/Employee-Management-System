@@ -1,21 +1,59 @@
-const dotenv = require("dotenv");
+app.listen(process.env.PORT);
+const express = require('express');
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const path = require('path');
+const userRouter = require('./routes/user.routes');
+const connectToDB = require('./config/db');
+const cors = require('cors');
+
+// Load environment variables
 dotenv.config();
-const express = require("express");
+
+// Initialize Express app
 const app = express();
 
+// Middleware for CORS
+app.use(
+  cors({
+    origin: '*', // Allow all origins (can be restricted as needed)
+    methods: ['GET', 'POST'], // Allow GET and POST methods
+    credentials: true, // Allow cookies to be sent
+  })
+);
+
+// Connect to the database
+(async () => {
+  try {
+    await connectToDB();
+    console.log('Connected to the database successfully');
+  } catch (err) {
+    console.error('Failed to connect to the database:', err);
+    process.exit(1); // Exit the process if database connection fails
+  }
+})();
+
+// Middleware setup
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const connectToDatabase = require("./db/db");
-connectToDatabase();
+// Set view engine
+app.set('view engine', 'ejs'); // Using EJS as the templating engine
+app.set('views', path.join(__dirname, 'views')); // Set the views directory
 
-const userRoutes = require("./routes/user.routes");
+// Routes
+app.use('/user', userRouter);
 
-
-app.get("/", (req, res) => {
-  res.json({ message: "testing" });
+// Basic error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message);
+  res.status(err.status || 500).json({ message: 'Internal Server Error' });
 });
-app.use('/',userRoutes)
 
+// Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
-app.listen(process.env.PORT);
