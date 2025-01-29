@@ -1,28 +1,24 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import Login from './Admin/Component/Auth';
-import AppLayout from './Admin/Component/AppLayout';
-import AdminRoutes from './Admin/AdminRoutes';
-// import Sidebar from './Admin/Component/Sidebar';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AdminRoutes from "./AdminPortal/adminRoutes";
+import EmployeeRoutes from "./EmployeePortal/employeeRoutes";
+import LandingPage from "./LandingPage/LandingPage";
 
-const App = () => {
-  const [isDark, setIsDark] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentPage, setCurrentPage] = useState('/admin');
-
-  const toggleTheme = () => setIsDark(!isDark);
-
-  if (!isAuthenticated) {
-    return <Login onLogin={() => setIsAuthenticated(true)} />;
-  }
-
+function App() {
   return (
     <Router>
-      <AppLayout isDark={isDark} toggleTheme={toggleTheme}>
-        <AdminRoutes isDark={isDark} />
-      </AppLayout>
+      <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Admin Portal */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        {/* Employee Portal */}
+        <Route path="/employee/*" element={<EmployeeRoutes />} />
+      </Routes>
     </Router>
   );
-};
+}
 
 export default App;

@@ -1,9 +1,9 @@
-app.listen(process.env.PORT);
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const userRouter = require('./routes/user.routes');
+const adminRouter = require('./routes/admin.routes');
 const connectToDB = require('./config/db');
 const cors = require('cors');
 
@@ -44,6 +44,7 @@ app.set('views', path.join(__dirname, 'views')); // Set the views directory
 
 // Routes
 app.use('/user', userRouter);
+app.use('/admin', adminRouter);
 
 // Basic error handler
 app.use((err, req, res, next) => {
