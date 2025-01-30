@@ -2,29 +2,35 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 
-export default function AdminLogin({ setIsAuthenticated }) {
-  const [adminId, setAdminId] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
-  const navigate = useNavigate()
+export default function AdminLogin() {
+  const [adminId, setAdminId] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);  // Define state here
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
-      const res = await axios.post('http://localhost:3000/admin/login', {
-        adminId,
-        password,
-        rememberMe
-      })
-      
-      setIsAuthenticated(true)
-      navigate("/admin/dashboard")
+      const res = await axios.post(
+        'http://localhost:3000/admin/login',
+        { adminId, password },
+        { withCredentials: true } // Include cookies for authentication
+      );
+
+      if (rememberMe) {
+        localStorage.setItem('token', res.data.token);
+      }
+
+      setIsAuthenticated(true);
+      navigate('/admin/dashboard');
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Login failed, please try again!"
-      alert(errorMessage)
+      console.error('Login error:', error); 
+      const errorMessage = error.response?.data?.message || 'Login failed, please try again!';
+      alert(errorMessage);
     }
-  }
+  };
 
   const handleForgotPassword = () => {
     navigate("/admin/forgot-password")

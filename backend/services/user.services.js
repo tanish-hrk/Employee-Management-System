@@ -13,9 +13,9 @@ module.exports.createUser =async ({ firstname, lastname, email, password }) => {
   return user;
 };
 
-module.exports.createAdmin =async ({ email, password }) => {
+module.exports.createAdmin =async ({ adminId, password }) => {
   const admin =await adminModel.create({
-    email,
+    adminId,
     password,
   });
   return admin;

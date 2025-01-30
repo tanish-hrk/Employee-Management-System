@@ -10,51 +10,52 @@ dotenv.config();
 // Create initial admin if none exists
 const createInitialAdmin = async () => {
   try {
-    const adminExists = await Admin.findOne({ email: process.env.ADMIN_EMAIL });
-    
+    const adminExists = await Admin.findOne({ adminId: process.env.ADMIN_ID });
+
     if (!adminExists) {
+      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+
       await Admin.create({
-        email: process.env.ADMIN_EMAIL,
-        password: process.env.ADMIN_PASSWORD,
+        adminId: process.env.ADMIN_ID,
+        password: hashedPassword,
         name: 'Super Admin',
-        role: 'superadmin'
+        role: 'superadmin',
       });
+
       console.log('Initial admin account created');
+    } else {
+      console.log('Initial admin already exists');
     }
   } catch (error) {
     console.error('Error creating initial admin:', error);
   }
 };
 
-// Call this when your application starts
+// Call this when the application starts
 createInitialAdmin();
 
 // Admin login route
 router.post('/login', async (req, res) => {
   console.log('Admin login request received:', req.body);
-  const { email, password } = req.body;
+  const { adminId, password } = req.body;
 
   try {
-    // Check if email and password are provided
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+    if (!adminId || !password) {
+      return res.status(400).json({ message: 'Admin ID and password are required' });
     }
 
-    // Find admin by email
-    const admin = await Admin.findOne({ email });
+    // Find admin by adminId
+    const admin = await Admin.findOne({ adminId });
     if (!admin) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Check if admin is active
-    if (!admin.isActive) {
-      return res.status(403).json({ message: 'Account is deactivated' });
-    }
+    // ❌ Removed the isActive check
 
     // Verify password
-    const isMatch = await admin.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Update last login time
@@ -63,24 +64,22 @@ router.post('/login', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: admin._id,
-        email: admin.email,
-        role: admin.role 
-      },
+      { id: admin._id, adminId: admin.adminId, role: admin.role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
+    // Set token in secure httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3600000, // 1 hour
+    });
+
     res.status(200).json({
       message: 'Login successful',
       token,
-      admin: {
-        id: admin._id,
-        email: admin.email,
-        name: admin.name,
-        role: admin.role
-      }
+      admin: { id: admin._id, adminId: admin.adminId, name: admin.name, role: admin.role },
     });
 
   } catch (err) {
@@ -89,33 +88,35 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Create new admin route (protected - only super admin can create other admins)
+
+// Create new admin route (only super admin can create others)
 router.post('/create', async (req, res) => {
-  const { email, password, name, role } = req.body;
+  const { adminId, password, name, role } = req.body;
 
   try {
-    // Check if admin already exists
-    const existingAdmin = await Admin.findOne({ email });
+    const existingAdmin = await Admin.findOne({ adminId });
     if (existingAdmin) {
       return res.status(400).json({ message: 'Admin already exists' });
     }
 
-    // Create new admin
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newAdmin = await Admin.create({
-      email,
-      password,
+      adminId,
+      password: hashedPassword,
       name,
-      role: role || 'admin'
+      role: role || 'admin',
     });
 
     res.status(201).json({
       message: 'Admin created successfully',
       admin: {
         id: newAdmin._id,
-        email: newAdmin.email,
+        adminId: newAdmin.adminId,
         name: newAdmin.name,
-        role: newAdmin.role
-      }
+        role: newAdmin.role,
+      },
     });
 
   } catch (err) {
@@ -135,13 +136,13 @@ router.put('/update-password', async (req, res) => {
     }
 
     // Verify current password
-    const isMatch = await admin.comparePassword(currentPassword);
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
 
-    // Update password
-    admin.password = newPassword;
+    // Hash new password before saving
+    admin.password = await bcrypt.hash(newPassword, 10);
     await admin.save();
 
     res.status(200).json({ message: 'Password updated successfully' });

@@ -13,12 +13,12 @@ dotenv.config();
 // Initialize Express app
 const app = express();
 
-// Middleware for CORS
+// ✅ Proper CORS Middleware
 app.use(
   cors({
-    origin: '*', // Allow all origins (can be restricted as needed)
-    methods: ['GET', 'POST'], // Allow GET and POST methods
-    credentials: true, // Allow cookies to be sent
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Replace with frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow common methods
+    credentials: true, // Allow cookies and authentication headers
   })
 );
 
@@ -39,8 +39,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Set view engine
-app.set('view engine', 'ejs'); // Using EJS as the templating engine
-app.set('views', path.join(__dirname, 'views')); // Set the views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 app.use('/user', userRouter);
@@ -57,4 +57,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
