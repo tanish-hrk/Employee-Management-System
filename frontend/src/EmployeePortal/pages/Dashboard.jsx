@@ -9,6 +9,8 @@ const Card = ({ children, className = "" }) => (
   </div>
 );
 
+
+
 export default function Dashboard() {
   // Mock data for the attendance boxes
   // const attendanceData = [

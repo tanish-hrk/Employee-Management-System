@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminRoutes from "./AdminPortal/adminRoutes";
+import AdminRoutes from "./AdminPortal/AdminRoutes";
 import EmployeeRoutes from "./EmployeePortal/employeeRoutes";
 import LandingPage from "./LandingPage/LandingPage";
 

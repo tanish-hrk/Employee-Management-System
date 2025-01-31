@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 
-export default function AdminLogin() {
+export default function AdminLogin({setIsAuthenticated}) {
   const [adminId, setAdminId] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);  // Define state here
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log("i am here");
+    
     try {
       const res = await axios.post(
         'http://localhost:3000/admin/login',
@@ -22,8 +22,9 @@ export default function AdminLogin() {
       if (rememberMe) {
         localStorage.setItem('token', res.data.token);
       }
-
-      setIsAuthenticated(true);
+    // console.log(res);
+    
+    setIsAuthenticated(true);
       navigate('/admin/dashboard');
     } catch (error) {
       console.error('Login error:', error); 

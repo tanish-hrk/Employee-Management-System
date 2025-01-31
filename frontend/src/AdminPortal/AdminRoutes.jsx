@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import Employee from './pages/Employee'
@@ -13,12 +13,12 @@ import Login from './pages/Auth'
 import AppLayout from './pages/AppLayout'
 
 // Protected Route Component
-const ProtectedRoute = ({ children, isAuthenticated }) => {
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />
-  }
-  return children
-}
+// const ProtectedRoute = ({ children, isAuthenticated }) => {
+//   if (!isAuthenticated) {
+//     return <Navigate to="/admin/login" replace />
+//   }
+//   return children
+// }
 
 // Protected Layout Component
 const ProtectedLayout = ({ children, isDark, isAuthenticated }) => {
@@ -28,22 +28,23 @@ const ProtectedLayout = ({ children, isDark, isAuthenticated }) => {
   return <AppLayout isDark={isDark}>{children}</AppLayout>
 }
 
-const AdminRoutes = ({ isDark, isAuthenticated }) => {
+const AdminRoutes = ({ isDark }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);  // Define state here
   return (
     <Routes>
       {/* Public Route */}
       <Route path="/login" element={
         isAuthenticated ? 
         <Navigate to="/admin/dashboard" replace /> : 
-        <Login isDark={isDark} />
+        <Login isDark={isDark} setIsAuthenticated={setIsAuthenticated} />
       } />
 
       {/* Protected Routes */}
       <Route path="/*" element={
         <ProtectedLayout isDark={isDark} isAuthenticated={isAuthenticated}>
           <Routes>
-            <Route path="dashboard" element={<Dashboard isDark={isDark} />} />
-            <Route path="employees" element={<Employee isDark={isDark} />} />
+            <Route path="dashboard" element={<Dashboard isDark={isDark}/>} />
+            <Route path="employees" element={<Employee isDark={isDark}  />} />
             <Route path="meetings" element={<Meeting isDark={isDark} />} />
             <Route path="tasks" element={<Tasks isDark={isDark} />} />
             <Route path="categories" element={<Categories isDark={isDark} />} />

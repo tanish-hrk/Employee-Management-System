@@ -8,11 +8,14 @@ import Testimonials from "./pages/Testimonials"
 import Integration from "./pages/Integration"
 import Contact from "./pages/Contact"
 import Footer from "./pages/Footer"
+import { useState } from "react"
 
 export default function Home() {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar  />
       <Hero />
       <Features />
       <Authentication />

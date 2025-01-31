@@ -72,6 +72,7 @@ export default function Navbar() {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {["Home", "Features", "Portals", "Performance", "Pricing", "Testimonials", "Contact"].map((item, index) => (
               <a
+              onClick={() => setMobileMenuOpen(false)}
                 key={index}
                 href={`#${item.toLowerCase().replace("/", "")}`}
                 className="text-gray-300 hover:text-white block px-3 py-2"

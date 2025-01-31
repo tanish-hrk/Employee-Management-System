@@ -16,7 +16,7 @@ const app = express();
 // ✅ Proper CORS Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Replace with frontend URL
+    origin: "http://localhost:5174", // Replace with frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow common methods
     credentials: true, // Allow cookies and authentication headers
   })
