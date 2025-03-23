@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Users, Calendar, ClipboardList, Award } from 'lucide-react';
+import { Layout, Users, Calendar, ClipboardList, Award, ChevronRight } from 'lucide-react';
 
 const Sidebar = ({ isDark, currentPage, setCurrentPage }) => {
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const menuItems = [
     { label: 'Dashboard', icon: <Layout size={24} />, path: '/admin' },
@@ -16,9 +17,13 @@ const Sidebar = ({ isDark, currentPage, setCurrentPage }) => {
 
   return (
     <aside
-      className={`min-h-screen w-64 fixed bg-gray-900 text-white pt-16 ${isDark ? 'dark' : ''}`}
+      className={`fixed min-h-screen bg-gray-900 text-white pt-16 transition-all duration-300 ${
+        isCollapsed ? 'w-16' : 'w-64'
+      }`}
+      onMouseEnter={() => setIsCollapsed(false)}
+      onMouseLeave={() => setIsCollapsed(true)}
     >
-      <nav>
+      <nav className="flex flex-col items-start">
         {menuItems.map((item) => (
           <button
             key={item.label}
@@ -26,13 +31,12 @@ const Sidebar = ({ isDark, currentPage, setCurrentPage }) => {
               navigate(item.path);
               setCurrentPage(item.path);
             }}
-            className={`flex items-center w-full px-6 py-3 text-white ${
+            className={`flex items-center w-full px-4 py-3 text-white transition-all duration-300 ${
               currentPage === item.path ? 'bg-gray-700' : 'hover:bg-gray-700'
             }`}
           >
-            {/* Icon */}
-            <span className="mr-3">{item.icon}</span>
-            {item.label}
+            <span>{item.icon}</span>
+            {!isCollapsed && <span className="ml-3">{item.label}</span>}
           </button>
         ))}
       </nav>

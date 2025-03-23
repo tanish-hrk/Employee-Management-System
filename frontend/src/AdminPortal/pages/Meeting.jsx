@@ -25,7 +25,10 @@ const Meeting = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-medium text-gray-800">Meeting Scheduler</h1>
-        <button className="bg-gray-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800">
+        <button 
+          className="bg-gray-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
+          onClick={() => window.open('...../webrtc.html', '_blank')}
+        >
           <span>+</span>
           Schedule Meeting
         </button>

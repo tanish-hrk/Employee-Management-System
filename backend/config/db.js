@@ -6,6 +6,7 @@ dotenv.config();
 const connectToDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
+      readPreference: 'primary',
     });
     console.log('Database connected successfully');
   } catch (err) {
