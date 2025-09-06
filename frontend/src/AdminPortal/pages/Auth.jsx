@@ -14,7 +14,7 @@ export default function AdminLogin({setIsAuthenticated}) {
     
     try {
       const res = await axios.post(
-        'http://localhost:3000/admin/login',
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/admin/login`,
         { adminId, password },
         { withCredentials: true } // Include cookies for authentication
       );

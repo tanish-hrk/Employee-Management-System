@@ -31,7 +31,7 @@ export default function Signup({ setIsAuthenticated }) {
     }
 
     try {
-      const res = await axios.post('http://localhost:3000/user/signup', formData);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/user/signup`, formData);
       console.log('Signup successful:', res.data);
 
       navigate('/login');

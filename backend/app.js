@@ -26,7 +26,9 @@ const io = socketIo(server, {
 // ✅ Proper CORS Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173", // Replace with frontend URL
+    origin: process.env.NODE_ENV === 'production' 
+      ? ["https://emasy.vercel.app", "http://localhost:5173"]
+      : "http://localhost:5173",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow common methods
     credentials: true, // Allow cookies and authentication headers
   })

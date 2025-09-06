@@ -46,7 +46,7 @@ const Leave = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/user/leave', newLeave, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/user/leave`, newLeave, {
         withCredentials: true
       });
       

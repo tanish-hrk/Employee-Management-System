@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3000', {
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000', {
       withCredentials: true,
     });
 

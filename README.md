@@ -119,39 +119,65 @@ Employee-Management-System/
                 └── Footer.jsx
 ```
 
-## Getting Started
+## 🚀 Live Demo
 
-### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB
-- npm or yarn
+- **Frontend**: https://emasy.vercel.app/
+- **Backend**: https://emasy-server.vercel.app/
 
-### Installation
+## Deployment
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/tanish-hrk/Employee-Management-System.git
-   cd Employee-Management-System
-   ```
+### Frontend (Vercel)
+1. **Environment Variables**: Set the following in Vercel:
+   - `VITE_API_URL`: `https://emasy-server.vercel.app`
+   - `VITE_SOCKET_URL`: `https://emasy-server.vercel.app`
 
-2. **Backend Setup**:
-   ```bash
-   cd backend
-   npm install
-   # Create a .env file with your MongoDB URI and JWT secret
-   npm start
-   ```
+2. **Deploy**: Connect your GitHub repository to Vercel and deploy the frontend.
 
-3. **Frontend Setup**:
-   ```bash
-   cd ../frontend
-   npm install
-   npm run dev
-   ```
+### Backend (Vercel)
+1. **Environment Variables**:
+   - `PORT`: 3000 (or hosting platform's default)
+   - `JWT_SECRET`: Your JWT secret key
+   - `MONGO_URI`: Your MongoDB connection string
+   - `ADMIN_ID`: Admin login ID
+   - `ADMIN_PASSWORD`: Admin password
+   - `NODE_ENV`: production
+
+2. **CORS Configuration**: Backend is configured to accept requests from `https://emasy.vercel.app`
+
+### Local Development
+```bash
+# Backend
+cd backend
+npm install
+npm start
+
+# Frontend
+cd frontend
+npm install
+npm run dev
+```
 
 4. **Access the application**:
    - Frontend: http://localhost:5173
-   - Backend: http://localhost:5000
+   - Backend: http://localhost:3000
+
+## Default Credentials
+
+- **Admin Login**:
+  - ID: `TANISH05`
+  - Password: `System@123`
+
+- **Employee**: Create account via signup or use test data
+
+## Features
+
+- **Real-time Video Meetings** with WebRTC and Socket.IO
+- **Task Management** with progress tracking
+- **Leave Management** with approval workflow
+- **Employee Dashboard** with analytics
+- **Admin Portal** for management
+- **Authentication** with JWT tokens
+- **Responsive Design** with Tailwind CSS
 
 ## Usage
 
