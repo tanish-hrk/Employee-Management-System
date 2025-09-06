@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminRoutes from "./AdminPortal/AdminRoutes";
-import EmployeeRoutes from "./EmployeePortal/employeeRoutes";
+import EmployeeRoutes from "./EmployeePortal/EmployeeRoutes";
 import LandingPage from "./LandingPage/LandingPage";
 
 function App() {
