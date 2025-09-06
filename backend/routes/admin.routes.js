@@ -36,7 +36,6 @@ createInitialAdmin();
 
 // Admin login route
 router.post('/login', async (req, res) => {
-  console.log('Admin login request received:', req.body);
   const { adminId, password } = req.body;
 
   try {
@@ -49,8 +48,6 @@ router.post('/login', async (req, res) => {
     if (!admin) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-
-    // ❌ Removed the isActive check
 
     // Verify password
     const isMatch = await bcrypt.compare(password, admin.password);

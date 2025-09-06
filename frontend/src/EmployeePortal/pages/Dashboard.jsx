@@ -1,5 +1,7 @@
 // File: src/pages/Dashboard.jsx
 import { Bell, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 // Card base components
 // eslint-disable-next-line react/prop-types
@@ -9,9 +11,32 @@ const Card = ({ children, className = "" }) => (
   </div>
 );
 
-
-
 export default function Dashboard() {
+  const [stats, setStats] = useState({
+    totalTasks: 0,
+    completedTasks: 0,
+    pendingTasks: 0,
+    attendanceRate: 92
+  });
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      // In a real app, you'd fetch from actual endpoints
+      // For now, we'll use mock data
+      setStats({
+        totalTasks: 12,
+        completedTasks: 8,
+        pendingTasks: 4,
+        attendanceRate: 92
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
   // Mock data for the attendance boxes
   // const attendanceData = [
   //   { status: 'present' },
@@ -53,7 +78,7 @@ export default function Dashboard() {
         <div className="bg-white shadow-md p-6 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Attendance Rate</p>
-              <p className="text-2xl font-bold">92%</p>
+              <p className="text-2xl font-bold">{stats.attendanceRate}%</p>
             </div>
             <TrendingUp className="w-6 h-6 text-yellow-600" />
           </div>
@@ -62,17 +87,17 @@ export default function Dashboard() {
         {/* Task Progress Card */}
         <Card className="p-4">
           <h3 className="font-semibold mb-3">Task Progress</h3>
-          <p className="text-gray-600 mb-2">75% Complete</p>
+          <p className="text-gray-600 mb-2">{stats.completedTasks}/{stats.totalTasks} Complete</p>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-green-500 h-2 rounded-full w-3/4"></div>
+            <div className="bg-green-500 h-2 rounded-full" style={{width: `${(stats.completedTasks/stats.totalTasks)*100}%`}}></div>
           </div>
         </Card>
 
-        {/* Salary Overview Card */}
+        {/* Pending Tasks Card */}
         <Card className="p-4">
-          <h3 className="font-semibold mb-3">Salary Overview</h3>
-          <div className="text-2xl font-bold mb-1">$5,240</div>
-          <p className="text-green-500">+8% from last month</p>
+          <h3 className="font-semibold mb-3">Pending Tasks</h3>
+          <p className="text-2xl font-bold text-red-500">{stats.pendingTasks}</p>
+          <p className="text-gray-600">Need Attention</p>
         </Card>
       </div>
 

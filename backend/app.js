@@ -6,12 +6,22 @@ const userRouter = require('./routes/user.routes');
 const adminRouter = require('./routes/admin.routes');
 const connectToDB = require('./config/db');
 const cors = require('cors');
+const http = require('http');
+const socketIo = require('socket.io');
 
 // Load environment variables
 dotenv.config();
 
 // Initialize Express app
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 // ✅ Proper CORS Middleware
 app.use(
@@ -46,6 +56,61 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Join a meeting room
+  socket.on('join-meeting', (meetingId) => {
+    socket.join(meetingId);
+    console.log(`User ${socket.id} joined meeting ${meetingId}`);
+    
+    // Notify others in the room
+    socket.to(meetingId).emit('user-joined', { userId: socket.id });
+  });
+
+  // Handle WebRTC signaling
+  socket.on('offer', (data) => {
+    socket.to(data.room).emit('offer', {
+      offer: data.offer,
+      from: socket.id
+    });
+  });
+
+  socket.on('answer', (data) => {
+    socket.to(data.room).emit('answer', {
+      answer: data.answer,
+      from: socket.id
+    });
+  });
+
+  socket.on('ice-candidate', (data) => {
+    socket.to(data.room).emit('ice-candidate', {
+      candidate: data.candidate,
+      from: socket.id
+    });
+  });
+
+  // Handle chat messages
+  socket.on('send-message', (data) => {
+    socket.to(data.room).emit('receive-message', {
+      message: data.message,
+      from: socket.id,
+      timestamp: new Date()
+    });
+  });
+
+  // Leave meeting
+  socket.on('leave-meeting', (meetingId) => {
+    socket.leave(meetingId);
+    socket.to(meetingId).emit('user-left', { userId: socket.id });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
 // Basic error handler
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
@@ -54,6 +119,6 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

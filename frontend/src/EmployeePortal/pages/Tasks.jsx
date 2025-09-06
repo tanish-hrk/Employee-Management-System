@@ -1,26 +1,75 @@
 import { PenSquare } from "lucide-react";
 import { useState, useEffect } from "react";
-import axios from "axios"; // Import Axios for API requests
+import axios from "axios";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState({
+    taskTitle: '',
+    status: 'pending',
+    hoursSpent: 0,
+    progressUpdate: ''
+  });
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
-  // Load tasks from localStorage when the component mounts
+  // Fetch tasks from backend
   useEffect(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
-    }
+    fetchTasks();
   }, []);
 
-  // Save tasks to localStorage whenever the tasks state changes
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+  const fetchTasks = async () => {
+    try {
+      // For now, we'll use mock data since we don't have a GET endpoint
+      // In a real app, you'd call: const response = await axios.get('http://localhost:3000/user/tasks');
+      setTasks([
+        {
+          id: 1,
+          taskTitle: 'UI Design Review',
+          status: 'in-progress',
+          hoursSpent: 2,
+          progressUpdate: 'Completed wireframes, working on mockups'
+        },
+        {
+          id: 2,
+          taskTitle: 'API Integration',
+          status: 'pending',
+          hoursSpent: 0,
+          progressUpdate: 'Waiting for API documentation'
+        }
+      ]);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  };
 
   // Function to handle adding a new task
-  const addTask = (newTask) => {
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+  const addTask = async () => {
+    if (!newTask.taskTitle || !newTask.status || !newTask.progressUpdate) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:3000/user/tasks', newTask, {
+        withCredentials: true
+      });
+      console.log('Task added:', response.data);
+      
+      // Add to local state
+      setTasks(prevTasks => [...prevTasks, { ...newTask, id: Date.now() }]);
+      
+      // Reset form
+      setNewTask({
+        taskTitle: '',
+        status: 'pending',
+        hoursSpent: 0,
+        progressUpdate: ''
+      });
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error('Error adding task:', error);
+      alert('Failed to add task. Please try again.');
+    }
   };
 
   return (
@@ -28,6 +77,13 @@ const Tasks = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-800">Your Tasks</h1>
         <div className="flex gap-4">
+          <button 
+            onClick={() => setIsFormOpen(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          >
+            <PenSquare className="w-4 h-4" />
+            Add Task
+          </button>
           <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
             <svg
               className="w-6 h-6"
@@ -74,7 +130,65 @@ const Tasks = () => {
         {/* Task Update Form */}
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Submit Task Update</h2>
-          <TaskUpdateForm addTask={addTask} />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Task Title *
+              </label>
+              <input
+                type="text"
+                value={newTask.taskTitle}
+                onChange={(e) => setNewTask({...newTask, taskTitle: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter task title"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status *
+              </label>
+              <select
+                value={newTask.status}
+                onChange={(e) => setNewTask({...newTask, status: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Hours Spent
+              </label>
+              <input
+                type="number"
+                value={newTask.hoursSpent}
+                onChange={(e) => setNewTask({...newTask, hoursSpent: parseInt(e.target.value) || 0})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="0"
+                min="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Progress Update *
+              </label>
+              <textarea
+                value={newTask.progressUpdate}
+                onChange={(e) => setNewTask({...newTask, progressUpdate: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="3"
+                placeholder="Describe your progress..."
+              />
+            </div>
+            <button
+              onClick={addTask}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Submit Task Update
+            </button>
+          </div>
         </div>
 
         {/* Current Tasks */}
@@ -99,100 +213,6 @@ const StatCard = ({ title, value, subtitle, valueColor = "text-gray-900" }) => (
     <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
   </div>
 );
-
-const TaskUpdateForm = ({ addTask }) => {
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const newTask = {
-      taskTitle: formData.get("taskTitle"),
-      status: formData.get("status"),
-      hoursSpent: formData.get("hoursSpent"),
-      progressUpdate: formData.get("progressUpdate"),
-    };
-
-    try {
-      // Optionally, send data to the server
-      const response = await axios.post("http://localhost:5000/user/tasks", newTask, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.status === 201) {
-        addTask(newTask); // Add the new task to the task list
-        alert("Task submitted successfully!");
-      } else {
-        alert("Task submission failed.");
-      }
-    } catch (error) {
-      console.error("Error submitting task:", error);
-      alert("Failed to submit task. Please check the server.");
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-gray-600 mb-2">Task Title</label>
-        <select
-          name="taskTitle"
-          className="w-full border rounded-lg p-2 text-gray-600"
-          required
-        >
-          <option value="" disabled selected>
-            Select Task
-          </option>
-          <option value="UI Design Review">UI Design Review</option>
-          <option value="API Integration">API Integration</option>
-          <option value="Backend Complete">Backend Complete</option>
-        </select>
-      </div>
-      <div>
-        <label className="block text-gray-600 mb-2">Status</label>
-        <select
-          name="status"
-          className="w-full border rounded-lg p-2 text-gray-600"
-          required
-        >
-          <option value="" disabled selected>
-            Select Status
-          </option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-          <option value="Pending">Pending</option>
-        </select>
-      </div>
-      <div>
-        <label className="block text-gray-600 mb-2">Hours Spent</label>
-        <input
-          name="hoursSpent"
-          type="number"
-          min="0"
-          placeholder="Enter hours spent"
-          className="w-full border rounded-lg p-2 text-gray-400"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-gray-600 mb-2">Progress Update</label>
-        <textarea
-          name="progressUpdate"
-          placeholder="Enter your progress update and any challenges faced"
-          className="w-full border rounded-lg p-2 h-24 text-gray-400 resize-none"
-          required
-        />
-      </div>
-      <button
-        type="submit"
-        className="w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-800"
-      >
-        Submit Update
-      </button>
-    </form>
-  );
-};
 
 const TaskList = ({ tasks }) => (
   <div className="space-y-4">

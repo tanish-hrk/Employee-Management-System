@@ -6,11 +6,11 @@ const Leave = require('../models/Employee/leave.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const authenticateToken = require('../middleware/auth');
 
 
 // Signup API
 router.post('/signup', async (req, res) => {
-        console.log(req.body);
         
         const { employeeId, fullName, email, password } = req.body;
         if (!employeeId || !fullName || !email || !password) {
@@ -45,7 +45,6 @@ router.post('/signup', async (req, res) => {
 );
 
 router.post('/login', async (req, res) => {
-    console.log('Login request received:', req.body);  // Log the request body
     const { employeeId, password } = req.body
   
     try {
@@ -78,7 +77,7 @@ router.post('/login', async (req, res) => {
     }
   });
 
-  router.post("/tasks", async (req, res) => {
+  router.post("/tasks", authenticateToken, async (req, res) => {
     try {
       const { taskTitle, status, hoursSpent, progressUpdate, dueDate} = req.body;
       await Task.create({
@@ -93,11 +92,6 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
       }
   
-      // Log the task (you can replace this with database logic if needed)
-      console.log(req.body);
-      
-      console.log("Task submitted:", { taskTitle, status, hoursSpent, progressUpdate});
-  
       // Respond to the client
       res.status(201).json({ message: "Task submitted successfully!" });
     } catch (error) {
@@ -106,15 +100,12 @@ router.post('/login', async (req, res) => {
     }
   });
 
-  router.post("/leave", async (req, res) => {
+  router.post("/leave", authenticateToken, async (req, res) => {
     try {
       const { leaveType, startDate, endDate, reason } = req.body;
   
-      console.log("Received request body:", req.body); // Log the request body
-  
       // Validate required fields
       if (!leaveType || !startDate || !endDate || !reason) {
-        console.log("Validation failed: Missing required fields");
         return res.status(400).json({
           success: false,
           message: "All fields are required",
@@ -126,7 +117,6 @@ router.post('/login', async (req, res) => {
       const end = new Date(endDate);
   
       if (start > end) {
-        console.log("Validation failed: Invalid date range");
         return res.status(400).json({
           success: false,
           message: "End date must be after start date",
@@ -140,8 +130,6 @@ router.post('/login', async (req, res) => {
         endDate,
         reason,
       });
-  
-      console.log("Leave request created successfully:", leave);
   
       // Return success response
       res.status(201).json({

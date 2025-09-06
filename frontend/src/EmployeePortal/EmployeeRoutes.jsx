@@ -11,46 +11,49 @@ import Salary from "./pages/Salary";
 import Leaderboard from "./pages/Leaderboard";
 import Leave from "./pages/Leave";
 import ProfilePage from "./pages/Profile";
+import { SocketProvider } from "./context/SocketContext";
 
 function EmployeeRoutes() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   return (
-    <Routes>
-      {/* Login Route */}
-      <Route
-        path="login"
-        element={<Login setIsAuthenticated={setIsAuthenticated} />}
-      />
+    <SocketProvider>
+      <Routes>
+        {/* Login Route */}
+        <Route
+          path="login"
+          element={<Login setIsAuthenticated={setIsAuthenticated} />}
+        />
 
-      {/* Signup Route */}
-      <Route
-        path="signup"
-        element={
-          !isAuthenticated ? (
-            <Signup setIsAuthenticated={setIsAuthenticated} />
-          ) : (
-            <Navigate to="/employee/login" replace />
-          )
-        }
-      />
+        {/* Signup Route */}
+        <Route
+          path="signup"
+          element={
+            !isAuthenticated ? (
+              <Signup setIsAuthenticated={setIsAuthenticated} />
+            ) : (
+              <Navigate to="/employee/login" replace />
+            )
+          }
+        />
 
-      {/* Protected Routes */}
-      {isAuthenticated ? (
-        <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="attendance" element={<Attendance />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="meetings" element={<Meetings />} />
-          <Route path="salary" element={<Salary />} />
-          <Route path="leaderboard" element={<Leaderboard />} />
-          <Route path="leave" element={<Leave />} />
-        </Route>
-      ) : (
-        <Route path="*" element={<Navigate to="/employee/login" replace />} />
-      )}
-    </Routes>
+        {/* Protected Routes */}
+        {isAuthenticated ? (
+          <Route path="/" element={<Layout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="meetings" element={<Meetings />} />
+            <Route path="salary" element={<Salary />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="leave" element={<Leave />} />
+          </Route>
+        ) : (
+          <Route path="*" element={<Navigate to="/employee/login" replace />} />
+        )}
+      </Routes>
+    </SocketProvider>
   );
 }
 

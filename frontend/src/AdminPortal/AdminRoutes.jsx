@@ -29,7 +29,7 @@ const ProtectedLayout = ({ children, isDark, isAuthenticated }) => {
 }
 
 const AdminRoutes = ({ isDark }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);  // Define state here
+  const [isAuthenticated, setIsAuthenticated] = useState(true);  // Define state here
   return (
     <Routes>
       {/* Public Route */}
